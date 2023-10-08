@@ -1,0 +1,70 @@
+Sending data from your FastAPI app to Prometheus and then visualizing it in Grafana is a multi-step process. Additionally, creating alerts that are sent to Alertmanager requires specific configurations in both Prometheus and Alertmanager.
+
+Here's a general outline:
+
+FastAPI + Prometheus: Export metrics from your FastAPI app in a format that Prometheus understands using an appropriate client library.
+Prometheus Configuration: Set up Prometheus to scrape these metrics.
+Alerts: Set up an alert in Prometheus when a specific condition is met (i.e., when the individual card count reaches 90).
+Alertmanager: Handle these alerts and perform specific actions (e.g., sending an email).
+1. FastAPI + Prometheus:
+Ensure your FastAPI app exposes a /metrics endpoint where Prometheus can scrape the data:
+
+python
+Copy code
+from prometheus_client import make_asgi_app
+from fastapi import FastAPI
+
+app = FastAPI()
+
+metrics_app = make_asgi_app()
+
+@app.get("/card")
+def read_root():
+    return draw_card()
+
+@app.mount("/metrics", app=metrics_app)  # Expose metrics on /metrics endpoint
+2. Prometheus Configuration:
+Your prometheus.yml should have a scrape configuration to pull data from your FastAPI app:
+
+yaml
+Copy code
+scrape_configs:
+  - job_name: 'fastapi-app'
+    static_configs:
+    - targets: ['localhost:8000']  # Assuming your FastAPI app runs on port 8000
+3. Alerts:
+In your prometheus.yml, set up an alert rule:
+
+yaml
+Copy code
+rule_files:
+  - 'alert_rules.yml'
+Then, in alert_rules.yml:
+
+yaml
+Copy code
+groups:
+- name: card_alerts
+  rules:
+  - alert: CardCountHigh
+    expr: individual_card_total{job="fastapi-app"} > 90
+    for: 1m  # Alert if condition is true for more than 1 minute
+    labels:
+      severity: critical
+    annotations:
+      summary: "High card count observed"
+      description: "The card count for {{ $labels.instance }} exceeded 90"
+4. Alertmanager:
+Ensure your Prometheus configuration is set up to send alerts to Alertmanager:
+
+yaml
+Copy code
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - localhost:9093  # Assuming Alertmanager runs on the default port 9093
+Your alertmanager.yml should then be configured to handle alerts, for example, to send notifications via email, Slack, or other methods.
+
+Remember, the entire alerting pipeline involves multiple components and configuration files. Make sure all components (FastAPI app, Prometheus, and Alertmanager) are correctly set up and working together. 
+The above is a general guideline, and you might need to adjust based on your specific environment and requirements.
