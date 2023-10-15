@@ -1,0 +1,9 @@
+- hosts: clients
+  become: yes
+  become_user: root
+
+  tasks:
+  - name: Cleanup file after stress test
+    ansible.builtin.file:
+      path: /root/file
+      state: absent

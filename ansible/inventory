@@ -1,0 +1,13 @@
+server:
+  hosts: 
+    prom:
+
+developer:
+  hosts:
+    dev:
+
+clients:
+  hosts:
+    spielplatz:
+    spielwiese:
+  

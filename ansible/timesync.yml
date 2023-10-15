@@ -1,0 +1,13 @@
+- hosts: all
+  become: yes
+  become_user: root
+
+  tasks:
+  - name: Install chronyd
+    apt: name=chrony
+
+  - name: make sure chrony is started and is enabled on restart
+    service: name=chrony state=restarted enabled=yes
+
+  - name: Set the timezone to 'Europe/Amsterdam'
+    timezone: name='Europe/Amsterdam'

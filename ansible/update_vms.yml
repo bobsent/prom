@@ -1,0 +1,25 @@
+- hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: Update apt-get and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Upgrade all apt packages
+      apt: upgrade=dist force_apt_get=yes
+
+    - name: Check if a reboot is needed for Ubuntu vms
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the Ubuntu vms
+      reboot:
+        msg: "Reboot initiated by Ansible due to kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delau: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+

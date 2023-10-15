@@ -1,0 +1,4 @@
+vmrun stop "/Users/xt03et/Virtual Machines.localized/Elastic.vmwarevm/Elastic.vmx"
+vmrun stop "/Users/xt03et/Virtual Machines.localized/fluentd.vmwarevm/fluentd.vmx"
+vmrun stop "/Users/xt03et/Virtual Machines.localized/Spielplatz.vmwarevm/Spielplatz.vmx"
+vmrun stop "/Users/xt03et/Virtual Machines.localized/Spielwiese.vmwarevm/Spielwiese.vmx"
